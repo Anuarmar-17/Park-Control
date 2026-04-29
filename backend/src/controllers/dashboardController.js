@@ -57,8 +57,8 @@ const getVehiculosEnCurso = async (req, res) => {
           u.nombre AS registrado_por
       FROM registros r
       JOIN tipos_vehiculo tv ON r.tipo_vehiculo_id = tv.id
-      JOIN ESPACIOS e ON r.espacio_id = e.id
-      JOIN USUARIOS u ON r.usuario_entrada_id = u.id
+      JOIN espacios e ON r.espacio_id = e.id
+      JOIN usuarios u ON r.usuario_entrada_id = u.id
       WHERE r.estado = 'EN_CURSO';
     `);
     
