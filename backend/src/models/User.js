@@ -4,8 +4,8 @@ class User {
   static async findByEmail(email) {
     const [rows] = await db.execute(
       `SELECT u.*, r.nombre AS rol_nombre 
-       FROM USUARIOS u 
-       JOIN ROLES r ON u.rol_id = r.id 
+       FROM usuarios u 
+       JOIN roles r ON u.rol_id = r.id 
        WHERE u.email = ?`,
       [email]
     );
