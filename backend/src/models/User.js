@@ -15,8 +15,8 @@ class User {
   static async findById(id) {
     const [rows] = await db.execute(
       `SELECT u.*, r.nombre AS rol_nombre 
-       FROM USUARIOS u 
-       JOIN ROLES r ON u.rol_id = r.id 
+       FROM usuarios u 
+       JOIN roles r ON u.rol_id = r.id 
        WHERE u.id = ?`,
       [id]
     );
@@ -26,7 +26,7 @@ class User {
   static async create(userData) {
     const { nombre, email, password, rol_id } = userData;
     const [result] = await db.execute(
-      `INSERT INTO USUARIOS (nombre, email, password_hash, rol_id) VALUES (?, ?, ?, ?)`,
+      `INSERT INTO usuarios (nombre, email, password_hash, rol_id) VALUES (?, ?, ?, ?)`,
       [nombre, email, password, rol_id]  // ← 'password' ya viene hasheado desde authController
     );
     return result.insertId;

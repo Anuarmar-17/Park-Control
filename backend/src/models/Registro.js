@@ -3,7 +3,7 @@ const db = require('../config/db');
 class Registro {
   static async findActivoByPlaca(placa) {
     const [rows] = await db.execute(
-      `SELECT * FROM REGISTROS 
+      `SELECT * FROM registros 
        WHERE placa = ? AND estado = 'EN_CURSO' 
        ORDER BY id DESC LIMIT 1`,
       [placa]
@@ -21,7 +21,7 @@ class Registro {
     } = data;
     
     const [result] = await db.execute(
-      `INSERT INTO REGISTROS 
+      `INSERT INTO registros 
        (placa, tipo_vehiculo_id, espacio_id, usuario_entrada_id, tarifa_id, fecha_hora_entrada, estado) 
        VALUES (?, ?, ?, ?, ?, NOW(), 'EN_CURSO')`,
       [placa, tipo_vehiculo_id, espacio_id, usuario_entrada_id, tarifa_id]
@@ -31,7 +31,7 @@ class Registro {
 
   static async registrarSalida(registro_id, usuario_salida_id, total_pagar) {
     await db.execute(
-      `UPDATE REGISTROS 
+      `UPDATE registros 
        SET fecha_hora_salida = NOW(), 
            usuario_salida_id = ?, 
            valor_calculado = ?, 
@@ -43,7 +43,7 @@ class Registro {
 
   static async generarTicket(registro_id, codigo) {
     const [result] = await db.execute(
-      `INSERT INTO TICKETS (registro_id, codigo_ticket, fecha_emision) 
+      `INSERT INTO tickets (registro_id, codigo_ticket, fecha_emision) 
        VALUES (?, ?, NOW())`,
       [registro_id, codigo]
     );
@@ -53,8 +53,8 @@ class Registro {
   static async getRegistroConDetalles(registro_id) {
     const [rows] = await db.execute(
       `SELECT r.*, t.codigo_ticket AS codigo_unico 
-       FROM REGISTROS r
-       LEFT JOIN TICKETS t ON r.id = t.registro_id
+       FROM registros r
+       LEFT JOIN tickets t ON r.id = t.registro_id
        WHERE r.id = ?`,
       [registro_id]
     );
@@ -65,9 +65,9 @@ class Registro {
     const parsedLimit = parseInt(limit, 10) || 10;
     const [rows] = await db.query(
       `SELECT r.*, tv.nombre AS tipo_vehiculo, t.codigo_ticket
-       FROM REGISTROS r
-       JOIN TIPOS_VEHICULO tv ON r.tipo_vehiculo_id = tv.id
-       LEFT JOIN TICKETS t ON r.id = t.registro_id
+       FROM registros r
+       JOIN tipos_vehiculo tv ON r.tipo_vehiculo_id = tv.id
+       LEFT JOIN tickets t ON r.id = t.registro_id
        WHERE r.estado = 'FINALIZADO'
        ORDER BY r.fecha_hora_salida DESC
        LIMIT ${parsedLimit}`
