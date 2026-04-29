@@ -9,16 +9,33 @@ const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
-// Middlewares globales
+// 🔥 Lista de orígenes permitidos
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:3000'
+];
+
+// 🔥 CORS bien configurado (SOLUCIÓN REAL)
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL,
-    'http://localhost:3000'
-  ],
+  origin: function (origin, callback) {
+    // Permite requests sin origin (Postman, etc)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      console.log('❌ CORS bloqueado para:', origin);
+      return callback(new Error('No permitido por CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+// 🔥 MUY IMPORTANTE (preflight)
+app.options('*', cors());
+
 app.use(express.json());
 
 // Rutas base
@@ -32,12 +49,12 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'API Parqueadero funcionando correctamente.' });
 });
 
-// Manejo de rutas no encontradas (404)
+// 404
 app.use((req, res, next) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
-// Middleware de manejo de errores
+// Errores
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Algo salió mal en el servidor.' });
