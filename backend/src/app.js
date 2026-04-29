@@ -18,7 +18,11 @@ const allowedOrigins = [
 // 🔥 CORS bien configurado (SOLUCIÓN REAL)
 app.use(cors({
   origin: function (origin, callback) {
-    // Permite requests sin origin (Postman, etc)
+    const allowedOrigins = [
+      process.env.FRONTEND_URL,
+      'http://localhost:3000'
+    ];
+
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
@@ -33,8 +37,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// 🔥 MUY IMPORTANTE (preflight)
-app.use(cors({...}));
 
 app.use(express.json());
 
