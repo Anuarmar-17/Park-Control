@@ -83,7 +83,7 @@ const registrarSalida = async (req, res) => {
     // Si queremos garantizar el historial completo, deberíamos cargar la tarifa a partir de registro.tarifa_id
     // Aquí simularemos traerla. (Lo ideal sería un Join o un FindById en Tarifa).
     const db = require('../config/db');
-    const [tarifas] = await db.execute('SELECT * FROM TARIFAS WHERE id = ?', [registro.tarifa_id]);
+    const [tarifas] = await db.execute('SELECT * FROM tarifas WHERE id = ?', [registro.tarifa_id]);
     const tarifa = tarifas[0];
 
     if (!tarifa) {

@@ -9,8 +9,8 @@ const getDisponibilidad = async (req, res) => {
           COUNT(e.id) AS total_cupos,
           SUM(CASE WHEN e.disponible = 1 THEN 1 ELSE 0 END) AS disponibles,
           SUM(CASE WHEN e.disponible = 0 THEN 1 ELSE 0 END) AS ocupados
-      FROM TIPOS_VEHICULO tv
-      JOIN ESPACIOS e ON tv.id = e.tipo_vehiculo_id
+      FROM tipos_vehiculo tv
+      JOIN espacios e ON tv.id = e.tipo_vehiculo_id
       GROUP BY tv.id;
     `);
     
@@ -55,8 +55,8 @@ const getVehiculosEnCurso = async (req, res) => {
           e.codigo AS espacio, 
           r.fecha_hora_entrada,
           u.nombre AS registrado_por
-      FROM REGISTROS r
-      JOIN TIPOS_VEHICULO tv ON r.tipo_vehiculo_id = tv.id
+      FROM registros r
+      JOIN tipos_vehiculo tv ON r.tipo_vehiculo_id = tv.id
       JOIN ESPACIOS e ON r.espacio_id = e.id
       JOIN USUARIOS u ON r.usuario_entrada_id = u.id
       WHERE r.estado = 'EN_CURSO';
@@ -76,7 +76,7 @@ const getMetricasAdmin = async (req, res) => {
       SELECT 
           COUNT(id) AS vehiculos_salidos,
           SUM(valor_calculado) AS total_dinero
-      FROM REGISTROS 
+      FROM registros 
       WHERE estado = 'FINALIZADO' 
       AND DATE(fecha_hora_salida) = CURDATE();
     `);
@@ -86,15 +86,15 @@ const getMetricasAdmin = async (req, res) => {
       SELECT 
           SUM(CASE WHEN tv.nombre IN ('sedán', 'camioneta') AND e.disponible = 0 THEN 1 ELSE 0 END) AS ocupacion_autos,
           SUM(CASE WHEN tv.nombre = 'moto' AND e.disponible = 0 THEN 1 ELSE 0 END) AS ocupacion_motos
-      FROM ESPACIOS e
-      JOIN TIPOS_VEHICULO tv ON e.tipo_vehiculo_id = tv.id
+      FROM espacios e
+      JOIN tipos_vehiculo tv ON e.tipo_vehiculo_id = tv.id
     `);
 
     // 3. Distribución por tipo de vehículo - HOY (entradas)
     const [distribucionHoy] = await pool.query(`
       SELECT tv.nombre, COUNT(r.id) as cantidad
-      FROM TIPOS_VEHICULO tv
-      LEFT JOIN REGISTROS r ON tv.id = r.tipo_vehiculo_id AND DATE(r.fecha_hora_entrada) = CURDATE()
+      FROM tipos_vehiculo tv
+      LEFT JOIN registros r ON tv.id = r.tipo_vehiculo_id AND DATE(r.fecha_hora_entrada) = CURDATE()
       GROUP BY tv.id
     `);
 
@@ -109,10 +109,10 @@ const getMetricasAdmin = async (req, res) => {
           r.valor_calculado AS total,
           u.nombre AS operario,
           tf.valor AS tarifa_valor
-      FROM REGISTROS r
-      JOIN TIPOS_VEHICULO tv ON r.tipo_vehiculo_id = tv.id
-      JOIN USUARIOS u ON r.usuario_salida_id = u.id
-      LEFT JOIN TARIFAS tf ON r.tarifa_id = tf.id
+      FROM registros r
+      JOIN tipos_vehiculo tv ON r.tipo_vehiculo_id = tv.id
+      JOIN usuarios u ON r.usuario_salida_id = u.id
+      LEFT JOIN tarifas tf ON r.tarifa_id = tf.id
       WHERE r.estado = 'FINALIZADO'
       ORDER BY r.fecha_hora_salida DESC
       LIMIT 10
@@ -124,7 +124,7 @@ const getMetricasAdmin = async (req, res) => {
           SUBSTRING(codigo, 1, 1) as zona,
           COUNT(*) as total,
           SUM(CASE WHEN disponible = 0 THEN 1 ELSE 0 END) as ocupados
-      FROM ESPACIOS
+      FROM espacios
       GROUP BY zona
     `);
 
@@ -158,7 +158,7 @@ const getReportesMensuales = async (req, res) => {
           COUNT(id) AS vehiculos_mes,
           SUM(valor_calculado) AS total_dinero_mes,
           COUNT(DISTINCT DATE(fecha_hora_salida)) AS dias_operativos
-      FROM REGISTROS 
+      FROM registros 
       WHERE estado = 'FINALIZADO' 
       AND MONTH(fecha_hora_salida) = MONTH(CURDATE())
       AND YEAR(fecha_hora_salida) = YEAR(CURDATE());
@@ -168,7 +168,7 @@ const getReportesMensuales = async (req, res) => {
     const [ocupacion] = await pool.query(`
       SELECT 
           (SUM(CASE WHEN disponible = 0 THEN 1 ELSE 0 END) / COUNT(*)) * 100 AS tasa_ocupacion
-      FROM ESPACIOS;
+      FROM espacios;
     `);
 
     // 3. Datos mes anterior para deltas
@@ -176,7 +176,7 @@ const getReportesMensuales = async (req, res) => {
       SELECT 
           COUNT(id) AS vehiculos_mes,
           SUM(valor_calculado) AS total_dinero_mes
-      FROM REGISTROS 
+      FROM registros 
       WHERE estado = 'FINALIZADO' 
       AND MONTH(fecha_hora_salida) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
       AND YEAR(fecha_hora_salida) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH));

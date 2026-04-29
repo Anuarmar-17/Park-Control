@@ -7,8 +7,8 @@ const getTarifas = async (req, res) => {
   try {
     const [rows] = await pool.query(`
       SELECT t.id, t.nombre, t.tipo_cobro, t.valor, t.activo, t.fecha_inicio, t.fecha_fin, tv.nombre AS tipo_vehiculo 
-      FROM TARIFAS t
-      JOIN TIPOS_VEHICULO tv ON t.tipo_vehiculo_id = tv.id
+      FROM tarifas t
+      JOIN tipos_vehiculo tv ON t.tipo_vehiculo_id = tv.id
     `);
     res.json(rows);
   } catch (error) {
@@ -21,7 +21,7 @@ const createTarifa = async (req, res) => {
   const { tipo_vehiculo_id, nombre, tipo_cobro, valor, fecha_inicio } = req.body;
   try {
     const [result] = await pool.query(
-      'INSERT INTO TARIFAS (tipo_vehiculo_id, nombre, tipo_cobro, valor, fecha_inicio) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO tarifas (tipo_vehiculo_id, nombre, tipo_cobro, valor, fecha_inicio) VALUES (?, ?, ?, ?, ?)',
       [tipo_vehiculo_id, nombre, tipo_cobro, valor, fecha_inicio || new Date()]
     );
     res.status(201).json({ id: result.insertId, message: 'Tarifa creada exitosamente' });
@@ -36,7 +36,7 @@ const updateTarifa = async (req, res) => {
   const { tipo_vehiculo_id, nombre, tipo_cobro, valor, activo, fecha_fin } = req.body;
   try {
     await pool.query(
-      'UPDATE TARIFAS SET tipo_vehiculo_id = ?, nombre = ?, tipo_cobro = ?, valor = ?, activo = ?, fecha_fin = ? WHERE id = ?',
+      'UPDATE tarifas SET tipo_vehiculo_id = ?, nombre = ?, tipo_cobro = ?, valor = ?, activo = ?, fecha_fin = ? WHERE id = ?',
       [tipo_vehiculo_id, nombre, tipo_cobro, valor, activo, fecha_fin, id]
     );
     res.json({ message: 'Tarifa actualizada exitosamente' });
@@ -49,7 +49,7 @@ const updateTarifa = async (req, res) => {
 const deleteTarifa = async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query('DELETE FROM TARIFAS WHERE id = ?', [id]);
+    await pool.query('DELETE FROM tarifas WHERE id = ?', [id]);
     res.json({ message: 'Tarifa eliminada exitosamente' });
   } catch (error) {
     console.error('Error al eliminar tarifa:', error);
@@ -63,8 +63,8 @@ const getUsuarios = async (req, res) => {
   try {
     const [rows] = await pool.query(`
       SELECT u.id, u.nombre, u.email, u.activo, u.ultimo_acceso, r.nombre AS rol 
-      FROM USUARIOS u
-      JOIN ROLES r ON u.rol_id = r.id
+      FROM usuarios u
+      JOIN roles r ON u.rol_id = r.id
     `);
     res.json(rows);
   } catch (error) {
@@ -79,7 +79,7 @@ const createUsuario = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
     const [result] = await pool.query(
-      'INSERT INTO USUARIOS (nombre, email, password_hash, rol_id) VALUES (?, ?, ?, ?)',
+      'INSERT INTO usuarios (nombre, email, password_hash, rol_id) VALUES (?, ?, ?, ?)',
       [nombre, email, password_hash, rol_id]
     );
     res.status(201).json({ id: result.insertId, message: 'Usuario creado exitosamente' });
@@ -97,12 +97,12 @@ const updateUsuario = async (req, res) => {
       const salt = await bcrypt.genSalt(10);
       const password_hash = await bcrypt.hash(password, salt);
       await pool.query(
-        'UPDATE USUARIOS SET nombre = ?, email = ?, rol_id = ?, activo = ?, password_hash = ? WHERE id = ?',
+        'UPDATE usuarios SET nombre = ?, email = ?, rol_id = ?, activo = ?, password_hash = ? WHERE id = ?',
         [nombre, email, rol_id, activo, password_hash, id]
       );
     } else {
       await pool.query(
-        'UPDATE USUARIOS SET nombre = ?, email = ?, rol_id = ?, activo = ? WHERE id = ?',
+        'UPDATE usuarios SET nombre = ?, email = ?, rol_id = ?, activo = ? WHERE id = ?',
         [nombre, email, rol_id, activo, id]
       );
     }
@@ -116,7 +116,7 @@ const updateUsuario = async (req, res) => {
 const deleteUsuario = async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query('DELETE FROM USUARIOS WHERE id = ?', [id]);
+    await pool.query('DELETE FROM usuarios WHERE id = ?', [id]);
     res.json({ message: 'Usuario eliminado exitosamente' });
   } catch (error) {
     console.error('Error al eliminar usuario:', error);
