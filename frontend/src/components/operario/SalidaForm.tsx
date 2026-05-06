@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { CobroCard } from "./CobroCard";
+import { QRScanner } from "./QRScanner";
 import { useParkingContext } from "@/context/ParkingContext";
 import { useToast } from "@/components/ui/Toast";
 import type { Vehicle, ExitRecord, BillingResult } from "@/types/parking";
@@ -18,9 +19,9 @@ export function SalidaForm({ onSuccess }: SalidaFormProps) {
   const [found,       setFound]       = useState<Vehicle | null>(null);
   const [billing,     setBilling]     = useState<BillingResult | null>(null);
   const [isLoading,   setIsLoading]   = useState(false);
+  const [isScanning,  setIsScanning]  = useState(false);
 
-  const handleSearch = useCallback(() => {
-    const p = searchPlaca.trim().toUpperCase();
+  const handleSearchWithPlaca = useCallback((p: string) => {
     if (!p) return showToast("Ingresa una placa para buscar", "error");
     const v = buscarVehiculo(p);
     if (!v) {
@@ -30,7 +31,22 @@ export function SalidaForm({ onSuccess }: SalidaFormProps) {
     setFound(v);
     setBilling(calcBilling(v));
     showToast(`Vehículo encontrado — Espacio ${v.slotId}`, "success");
-  }, [searchPlaca, buscarVehiculo, calcBilling, showToast]);
+    return v;
+  }, [buscarVehiculo, calcBilling, showToast]);
+
+  const handleSearch = useCallback(() => {
+    handleSearchWithPlaca(searchPlaca.trim().toUpperCase());
+  }, [searchPlaca, handleSearchWithPlaca]);
+
+  const handleScanSuccess = useCallback((decodedText: string) => {
+    setIsScanning(false);
+    const scannedPlaca = decodedText.trim().toUpperCase();
+    setSearchPlaca(scannedPlaca);
+    showToast(`QR Escaneado: ${scannedPlaca}`, "success");
+    
+    // Auto buscar el vehículo
+    handleSearchWithPlaca(scannedPlaca);
+  }, [handleSearchWithPlaca, showToast]);
 
   const handleConfirm = useCallback(async () => {
     if (!found) return;
@@ -74,14 +90,32 @@ export function SalidaForm({ onSuccess }: SalidaFormProps) {
 
       {found && billing && <CobroCard vehicle={found} billing={billing} />}
 
-      <button
-        className="btn-primary"
-        disabled={!found || isLoading}
-        onClick={handleConfirm}
-        style={{ marginTop: found ? "0" : "20px" }}
-      >
-        {isLoading ? "⏳ Procesando..." : "🎫 Confirmar Salida y Generar Ticket"}
-      </button>
+      <div style={{ display: "flex", gap: "10px", marginTop: found ? "0" : "20px" }}>
+        <button
+          className="btn-primary"
+          disabled={!found || isLoading}
+          onClick={handleConfirm}
+          style={{ flex: 1 }}
+        >
+          {isLoading ? "⏳ Procesando..." : "🎫 Confirmar Salida y Generar Ticket"}
+        </button>
+        <button
+          className="btn-primary"
+          style={{ backgroundColor: "var(--primary)", flex: "0 0 auto", width: "auto", padding: "0 15px" }}
+          onClick={() => setIsScanning(true)}
+          disabled={isLoading}
+          title="Escanear QR"
+        >
+          📸 Escanear QR
+        </button>
+      </div>
+
+      {isScanning && (
+        <QRScanner
+          onScanSuccess={handleScanSuccess}
+          onClose={() => setIsScanning(false)}
+        />
+      )}
     </div>
   );
 }

@@ -98,7 +98,7 @@ interface ParkingContextValue {
   calcBilling:    (v: Vehicle) => BillingResult;
 
   // Mutations
-  registrarEntradaAPI: (placa: string, tipo_vehiculo_id: number) => Promise<{ espacio: string; codigo_ticket: string }>;
+  registrarEntradaAPI: (placa: string, tipo_vehiculo_id: number) => Promise<{ espacio: string; codigo_ticket: string; qr_base64?: string }>;
   registrarSalidaAPI:  (placa: string) => Promise<ExitRecord>;
   refrescarDatos:      () => Promise<void>;
 }
@@ -240,11 +240,11 @@ export function ParkingProvider({ children }: { children: React.ReactNode }) {
   // ── Mutations via API ──────────────────────────────────────────────────────
 
   const registrarEntradaAPI = useCallback(
-    async (placa: string, tipo_vehiculo_id: number): Promise<{ espacio: string; codigo_ticket: string }> => {
+    async (placa: string, tipo_vehiculo_id: number): Promise<{ espacio: string; codigo_ticket: string; qr_base64?: string }> => {
       const data = await operacionService.registrarEntrada(placa, tipo_vehiculo_id);
       // Refresh data to sync disponibilidad and vehiculosEnCurso
       await refrescarDatos();
-      return { espacio: data.espacio, codigo_ticket: data.codigo_ticket };
+      return { espacio: data.espacio, codigo_ticket: data.codigo_ticket, qr_base64: data.qr_base64 };
     },
     [refrescarDatos]
   );

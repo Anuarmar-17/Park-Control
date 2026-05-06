@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui/Toast";
 import type { VehicleType } from "@/types/parking";
 
 interface EntradaFormProps {
-  onSuccess: (placa: string, slotId: string, ticketCode: string, tipo: VehicleType) => void;
+  onSuccess: (placa: string, slotId: string, ticketCode: string, tipo: VehicleType, qrBase64?: string) => void;
 }
 
 // Mapa de tipo de vehículo a tipo_vehiculo_id en la BD
@@ -39,10 +39,10 @@ export function EntradaForm({ onSuccess }: EntradaFormProps) {
     const tipo_vehiculo_id = TIPO_ID_MAP[tipo];
     setIsLoading(true);
     try {
-      const { espacio, codigo_ticket } = await registrarEntradaAPI(p, tipo_vehiculo_id);
+      const { espacio, codigo_ticket, qr_base64 } = await registrarEntradaAPI(p, tipo_vehiculo_id);
       setPlaca(""); setTipo("");
       showToast(`Entrada registrada — Espacio ${espacio}`, "success");
-      onSuccess(p, espacio, codigo_ticket, tipo as any);
+      onSuccess(p, espacio, codigo_ticket, tipo as any, qr_base64);
     } catch (err: any) {
       showToast(err.message || "Error al registrar la entrada", "error");
     } finally {

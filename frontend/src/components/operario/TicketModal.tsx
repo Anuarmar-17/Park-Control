@@ -30,6 +30,7 @@ interface EntradaModalProps {
   isOpen:  boolean;
   onClose: () => void;
   vehicle: Pick<Vehicle, "placa" | "tipo" | "slotId" | "entrada"> | null;
+  qrBase64?: string;
 }
 
 function TicketRow({ label, value }: { label: string; value: string }) {
@@ -41,7 +42,7 @@ function TicketRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function EntradaModal({ isOpen, onClose, vehicle }: EntradaModalProps) {
+export function EntradaModal({ isOpen, onClose, vehicle, qrBase64 }: EntradaModalProps) {
   if (!vehicle) return null;
   return (
     <BaseModal isOpen={isOpen} onClose={onClose}>
@@ -57,6 +58,17 @@ export function EntradaModal({ isOpen, onClose, vehicle }: EntradaModalProps) {
         <TicketRow label="Hora entrada"  value={fmtT(vehicle.entrada)} />
         <div className="t-sep"></div>
         <TicketRow label="Tarifa / fracción" value={`$${(TARIFA[vehicle.tipo] ?? 0).toLocaleString("es-CO")}`} />
+        {qrBase64 && (
+          <>
+            <div className="t-sep"></div>
+            <div style={{ textAlign: "center", marginTop: "1rem" }}>
+              <p style={{ fontSize: "0.8rem", color: "var(--muted)", marginBottom: "0.5rem" }}>
+                Escanea para registrar salida
+              </p>
+              <img src={qrBase64} alt="QR de Salida" style={{ width: "120px", height: "120px", margin: "0 auto", display: "block" }} />
+            </div>
+          </>
+        )}
       </div>
 
       <div className="modal-footer">

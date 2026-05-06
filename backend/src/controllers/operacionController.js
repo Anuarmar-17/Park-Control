@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const qr = require('qr-image');
 const Espacio = require('../models/Espacio');
 const Tarifa = require('../models/Tarifa');
 const Registro = require('../models/Registro');
@@ -47,11 +48,16 @@ const registrarEntrada = async (req, res) => {
     const codigoTicket = crypto.randomBytes(4).toString('hex').toUpperCase(); // Ejemplo: '8F4B92C1'
     await Registro.generarTicket(registroId, codigoTicket);
 
+    // 7. Generar código QR con la placa para poder escanear a la salida
+    const qrBuffer = qr.imageSync(placa, { type: 'png', margin: 1 });
+    const qr_base64 = `data:image/png;base64,${qrBuffer.toString('base64')}`;
+
     res.status(201).json({
       message: 'Entrada registrada exitosamente.',
       registro_id: registroId,
       espacio: espacioLibre.codigo,
-      codigo_ticket: codigoTicket
+      codigo_ticket: codigoTicket,
+      qr_base64
     });
 
   } catch (error) {

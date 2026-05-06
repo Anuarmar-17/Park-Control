@@ -46,7 +46,7 @@ function OperarioInner() {
   const [activeTab, setActiveTab] = useState<TabId>("entrada");
 
   // Modal state — entrada
-  const [entradaModal, setEntradaModal] = useState<{ placa: string; slotId: string; ticket: string; tipo: any } | null>(null);
+  const [entradaModal, setEntradaModal] = useState<{ placa: string; slotId: string; ticket: string; tipo: any; qrBase64?: string } | null>(null);
   // Modal state — salida
   const [salidaModal,  setSalidaModal]  = useState<ExitRecord | null>(null);
   const [ticketNo,     setTicketNo]     = useState("");
@@ -77,8 +77,8 @@ function OperarioInner() {
     status: calcStatus(motosFree, motosTotal),
   };
 
-  const handleEntradaSuccess = useCallback((placa: string, slotId: string, ticket: string, tipo: any) => {
-    setEntradaModal({ placa, slotId, ticket, tipo });
+  const handleEntradaSuccess = useCallback((placa: string, slotId: string, ticket: string, tipo: any, qrBase64?: string) => {
+    setEntradaModal({ placa, slotId, ticket, tipo, qrBase64 });
   }, []);
 
   const handleSalidaSuccess = useCallback((record: ExitRecord) => {
@@ -153,6 +153,7 @@ function OperarioInner() {
         isOpen={!!entradaModal}
         onClose={() => setEntradaModal(null)}
         vehicle={entradaModal ? { placa: entradaModal.placa, tipo: entradaModal.tipo, entrada: new Date(), slotId: entradaModal.slotId } : null}
+        qrBase64={entradaModal?.qrBase64}
       />
       <SalidaModal
         isOpen={!!salidaModal}
