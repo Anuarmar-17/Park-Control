@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
+import { Html5Qrcode } from "html5-qrcode";
 
 interface QRScannerProps {
   onScanSuccess: (decodedText: string) => void;
@@ -9,41 +9,41 @@ interface QRScannerProps {
 }
 
 export function QRScanner({ onScanSuccess, onClose }: QRScannerProps) {
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const isStoppingRef = useRef(false);
 
   useEffect(() => {
-    // Inicializar el escáner al montar
-    const scanner = new Html5QrcodeScanner(
-      "qr-reader",
+    const html5QrCode = new Html5Qrcode("qr-reader");
+    scannerRef.current = html5QrCode;
+
+    html5QrCode.start(
+      { facingMode: "environment" }, // Preferir cámara trasera
       {
         fps: 10,
         qrbox: { width: 250, height: 250 },
-        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
-        rememberLastUsedCamera: true,
       },
-      false
-    );
-
-    scannerRef.current = scanner;
-
-    scanner.render(
       (decodedText) => {
-        // Al detectar con éxito, detenemos el escáner y llamamos el callback
-        if (scannerRef.current) {
-          scannerRef.current.clear().catch(console.error);
+        // Éxito
+        if (!isStoppingRef.current) {
+          isStoppingRef.current = true;
+          html5QrCode.stop().then(() => {
+            onScanSuccess(decodedText);
+          }).catch(console.error);
         }
-        onScanSuccess(decodedText);
       },
       (errorMessage) => {
-        // Solo para debug o manejo silencioso, html5-qrcode lanza errores continuamente 
-        // cuando no detecta un QR en el frame actual.
+        // Errores de escaneo (silenciosos)
       }
-    );
+    ).catch((err) => {
+      console.error("Error al iniciar cámara", err);
+      setErrorMsg("No se pudo iniciar la cámara. Verifica los permisos.");
+    });
 
     return () => {
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(console.error);
+      if (scannerRef.current && scannerRef.current.isScanning && !isStoppingRef.current) {
+        isStoppingRef.current = true;
+        scannerRef.current.stop().catch(console.error);
       }
     };
   }, [onScanSuccess]);
