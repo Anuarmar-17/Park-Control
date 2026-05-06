@@ -101,7 +101,7 @@ export function SalidaForm({ onSuccess }: SalidaFormProps) {
         </button>
         <button
           className="btn-primary"
-          style={{ backgroundColor: "var(--primary)", flex: "0 0 auto", width: "auto", padding: "0 15px" }}
+          style={{ backgroundColor: "", flex: "0 0 auto", width: "auto", padding: "0 15px" }}
           onClick={() => setIsScanning(true)}
           disabled={isLoading}
           title="Escanear QR"
