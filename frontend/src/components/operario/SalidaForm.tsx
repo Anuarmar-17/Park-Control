@@ -53,7 +53,7 @@ export function SalidaForm({ onSuccess }: SalidaFormProps) {
     setIsLoading(true);
     try {
       const record = await registrarSalidaAPI(found.placa);
-      setSearchPlaca(""); setFound(null); setBilling(null);
+      setSearchPlaca(""); setFound(null); setBilling(null); setIsScanning(false);
       onSuccess(record);
     } catch (err: any) {
       showToast(err.message || "Error al registrar la salida", "error");
@@ -90,7 +90,7 @@ export function SalidaForm({ onSuccess }: SalidaFormProps) {
 
       {found && billing && <CobroCard vehicle={found} billing={billing} />}
 
-      <div style={{ display: "flex", gap: "10px", marginTop: found ? "0" : "20px" }}>
+      <div style={{ display: "flex", gap: "10px", marginTop: found ? "0" : "20px", flexWrap: "wrap" }}>
         <button
           className="btn-primary"
           disabled={!found || isLoading}
@@ -99,15 +99,27 @@ export function SalidaForm({ onSuccess }: SalidaFormProps) {
         >
           {isLoading ? "⏳ Procesando..." : "🎫 Confirmar Salida y Generar Ticket"}
         </button>
-        <button
-          className="btn-primary"
-          style={{ backgroundColor: "", flex: "0 0 auto", width: "auto", padding: "0 15px" }}
-          onClick={() => setIsScanning(true)}
-          disabled={isLoading}
-          title="Escanear QR"
-        >
-          📸 Escanear QR
-        </button>
+        {found ? (
+          <button
+            className="btn-primary"
+            style={{ background: "var(--danger)", flex: "0 0 auto", width: "auto", padding: "0 15px" }}
+            onClick={() => { setFound(null); setBilling(null); setSearchPlaca(""); }}
+            disabled={isLoading}
+            title="Limpiar búsqueda y escanear otro vehículo"
+          >
+            ✕ Nueva Búsqueda
+          </button>
+        ) : (
+          <button
+            className="btn-primary"
+            style={{ flex: "0 0 auto", width: "auto", padding: "0 15px" }}
+            onClick={() => setIsScanning(true)}
+            disabled={isLoading}
+            title="Escanear QR"
+          >
+            📸 Escanear QR
+          </button>
+        )}
       </div>
 
       {isScanning && (
