@@ -132,7 +132,7 @@ export function EntradaModal({ isOpen, onClose, vehicle, qrBase64 }: EntradaModa
       <div ref={printRef}>
         <div className="receipt">
           <div className="receipt-header" style={{ background: "#079455" }}>
-            <div className="logo">Nube<span>Park</span></div>
+            <div className="logo">Park<span>Control</span></div>
             <div className="subtitle">Ticket de Entrada</div>
           </div>
           <div className="receipt-type" style={{ background: "#ecfdf3", color: "#079455", borderBottom: "1px dashed #aee7c8" }}>✅ Entrada Registrada</div>
@@ -154,7 +154,7 @@ export function EntradaModal({ isOpen, onClose, vehicle, qrBase64 }: EntradaModa
             )}
           </div>
           <div className="receipt-footer">
-            <strong>NubePark — Control Inteligente</strong>
+            <strong>ParkControl — Control Inteligente</strong>
             Conserve este ticket para su salida
           </div>
         </div>
@@ -277,7 +277,7 @@ export function SalidaModal({ isOpen, onClose, record, ticketNo }: SalidaModalPr
       <div ref={printRef}>
         <div className="receipt">
           <div className="receipt-header" style={{ background: "#1570ef" }}>
-            <div className="logo">Nube<span>Park</span></div>
+            <div className="logo">Park<span>Control</span></div>
             <div className="subtitle">Ticket de Salida</div>
           </div>
           <div className="receipt-type" style={{ background: "#eff4ff", color: "#1570ef", borderBottom: "1px dashed #b2ccf8" }}>🎫 Comprobante de Pago</div>
@@ -299,7 +299,7 @@ export function SalidaModal({ isOpen, onClose, record, ticketNo }: SalidaModalPr
             </div>
           </div>
           <div className="receipt-footer">
-            <strong>NubePark — Control Inteligente</strong>
+            <strong>ParkControl — Control Inteligente</strong>
             Gracias por usar nuestro parqueadero
           </div>
         </div>
