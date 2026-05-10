@@ -190,7 +190,7 @@ function AdminInner() {
   };
 
   // ── Handlers: Usuarios ────────────────────────────────────────────────────
-  const handleSaveUsuario = async (data: Omit<Usuario, "id" | "acceso">) => {
+  const handleSaveUsuario = async (data: Omit<Usuario, "id" | "acceso"> & { password?: string }) => {
     try {
       if (usuarioEdit) {
         await adminService.updateUsuario(usuarioEdit.id, data);

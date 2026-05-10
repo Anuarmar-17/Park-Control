@@ -196,9 +196,44 @@ const getReportesMensuales = async (req, res) => {
   }
 };
 
+const getExportarReporte = async (req, res) => {
+  const { inicio, fin } = req.query;
+  try {
+    let query = `
+      SELECT 
+          r.id,
+          r.placa, 
+          tv.nombre AS tipo_vehiculo, 
+          r.fecha_hora_entrada, 
+          r.fecha_hora_salida,
+          r.valor_calculado,
+          u.nombre AS operario
+      FROM registros r
+      JOIN tipos_vehiculo tv ON r.tipo_vehiculo_id = tv.id
+      JOIN usuarios u ON r.usuario_salida_id = u.id
+      WHERE r.estado = 'FINALIZADO'
+    `;
+    const params = [];
+    
+    if (inicio && fin) {
+      query += ` AND DATE(r.fecha_hora_salida) BETWEEN ? AND ?`;
+      params.push(inicio, fin);
+    }
+    
+    query += ` ORDER BY r.fecha_hora_salida DESC`;
+
+    const [rows] = await pool.query(query, params);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error en getExportarReporte:', error);
+    res.status(500).json({ message: 'Error al exportar reporte' });
+  }
+};
+
 module.exports = {
   getDisponibilidad,
   getVehiculosEnCurso,
   getMetricasAdmin,
-  getReportesMensuales
+  getReportesMensuales,
+  getExportarReporte
 };

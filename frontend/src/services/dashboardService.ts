@@ -20,4 +20,13 @@ export const dashboardService = {
     fetchAPI('/dashboard/reportes-mensuales', {
       method: 'GET',
     }),
+
+  getExportarReporte: (inicio: string, fin: string) => {
+    const query = new URLSearchParams();
+    if (inicio) query.append('inicio', inicio);
+    if (fin) query.append('fin', fin);
+    return fetchAPI(`/dashboard/exportar-reporte?${query.toString()}`, {
+      method: 'GET',
+    });
+  },
 };

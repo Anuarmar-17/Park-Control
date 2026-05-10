@@ -8,7 +8,7 @@ interface UsuarioModalProps {
   isOpen:   boolean;
   onClose:  () => void;
   editing:  Usuario | null;
-  onSave:   (data: Omit<Usuario, "id" | "acceso">) => void;
+  onSave:   (data: Omit<Usuario, "id" | "acceso"> & { password?: string }) => void;
 }
 
 export function UsuarioModal({ isOpen, onClose, editing, onSave }: UsuarioModalProps) {
@@ -30,8 +30,14 @@ export function UsuarioModal({ isOpen, onClose, editing, onSave }: UsuarioModalP
   const handleSave = () => {
     if (!nombre.trim())             return alert("El nombre es obligatorio.");
     if (!email.includes("@"))       return alert("Ingresa un email válido.");
-    if (!editing && !pass.trim())   return alert("La contraseña es obligatoria.");
-    onSave({ nombre: nombre.trim(), email: email.trim(), rol, activo });
+    if (!editing && !pass.trim())   return alert("La contraseña es obligatoria para nuevos usuarios.");
+    onSave({
+      nombre: nombre.trim(),
+      email:  email.trim(),
+      rol,
+      activo,
+      ...(pass.trim() ? { password: pass.trim() } : {}),
+    });
     onClose();
   };
 
