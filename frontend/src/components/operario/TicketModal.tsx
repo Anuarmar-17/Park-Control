@@ -29,7 +29,7 @@ export function BaseModal({ isOpen, onClose, children }: ModalProps) {
 // ─── Entrada Modal ────────────────────────────────────────────────────────────
 
 interface EntradaModalProps {
-  isOpen:  boolean;
+  isOpen: boolean;
   onClose: () => void;
   vehicle: Pick<Vehicle, "placa" | "tipo" | "slotId" | "entrada"> | null;
   qrBase64?: string;
@@ -59,7 +59,7 @@ export function EntradaModal({ isOpen, onClose, vehicle, qrBase64 }: EntradaModa
       <html>
       <head>
         <meta charset="utf-8"/>
-        <title>Ticket de Entrada – NubePark</title>
+        <title>Ticket de Entrada – ParkControl</title>
         <style>
           @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap');
           * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -174,9 +174,9 @@ export function EntradaModal({ isOpen, onClose, vehicle, qrBase64 }: EntradaModa
 // ─── Salida Modal ─────────────────────────────────────────────────────────────
 
 interface SalidaModalProps {
-  isOpen:  boolean;
+  isOpen: boolean;
   onClose: () => void;
-  record:  ExitRecord | null;
+  record: ExitRecord | null;
   ticketNo?: string;
 }
 
@@ -203,7 +203,7 @@ export function SalidaModal({ isOpen, onClose, record, ticketNo }: SalidaModalPr
       <html>
       <head>
         <meta charset="utf-8"/>
-        <title>Ticket de Salida – NubePark</title>
+        <title>Ticket de Salida – ParkControl</title>
         <style>
           @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap');
           * { box-sizing: border-box; margin: 0; padding: 0; }
